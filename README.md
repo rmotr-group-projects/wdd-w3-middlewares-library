@@ -1,1 +1,1 @@
-# wdd-w3-middlewares-library
+# Middlewares library
