@@ -54,8 +54,6 @@ MIDDLEWARE_CLASSES = [
 
     # custom middlewares
     'library.middlewares.RequestLoggingMiddleware',
-    'library.middlewares.ExceptionLoggingMiddleware',
-    # 'library.middlewares.SSLRedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'middlewares_library.urls'

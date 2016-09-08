@@ -40,19 +40,3 @@ class MiddlewaresTestCase(TestCase):
         self.assertEqual(log.query_count, 0)
         self.assertTrue(isinstance(log.timestamp, datetime))
         self.assertTrue(isinstance(log.duration_in_seconds, int))
-
-    def test_ssl_redirect_middleware(self):
-        """Should redirect to secure url when given url is insecure"""
-        settings.MIDDLEWARE_CLASSES.append('library.middlewares.SSLRedirectMiddleware')
-        response = self.client.get('http://127.0.0.1/test/')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, 'https://127.0.0.1/test/')
-
-    def test_exception_logging_middleware(self):
-        """Should log all errors during the request/response lifecycle"""
-        with self.assertRaises(ValueError):
-            with LogCapture() as capture:
-                self.client.get('/exception/', follow=True)
-                capture.check(
-                    ('library.middlewares', 'ERROR', 'Something went wrong!')
-                )

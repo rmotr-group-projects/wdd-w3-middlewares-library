@@ -37,15 +37,23 @@ class RequestLoggingMiddleware(object):
 
 
 class SSLRedirectMiddleware(object):
+    """
+    If the request is not using HTTPS, redirects to the same URL but
+    using HTTPS.
+    """
+    pass
 
-    def process_request(self, request):
-        if not request.is_secure():
-            url = 'https://127.0.0.1{}'.format(request.get_full_path())
-            return HttpResponseRedirect(url)
-        return None
+
+class WWWRedirectMiddleware(object):
+    """
+    If "www" is included in the URL, redirects to the nacked version
+    of the domain (without "www" at the beginning)
+    """
+    pass
 
 
 class ExceptionLoggingMiddleware(object):
-
-    def process_exception(self, request, exception):
-        logger.error('Something went wrong, got: {}'.format(str(exception)))
+    """
+    Writes a log entry for every exception raised in any request.
+    """
+    pass
