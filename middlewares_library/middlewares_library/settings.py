@@ -50,7 +50,12 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware'
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    # Custom middleware classes
+    'library.middlewares.RequestLoggingMiddleware',
+    'library.middlewares.SSLRedirectMiddleware',
+    'library.middlewares.WWWRedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'middlewares_library.urls'
@@ -149,3 +154,6 @@ LOGGING = {
         }
     }
 }
+
+# WWWRedirectMiddleware configuration
+USE_WWW = False
