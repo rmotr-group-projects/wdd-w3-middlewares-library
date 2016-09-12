@@ -2,18 +2,15 @@ from datetime import datetime
 import logging
 from testfixtures import LogCapture
 
-from django.test import override_settings#, TestCase # Not sure I actually need WebTest for anything
-from django_webtest import WebTest
+from django.test import TestCase, override_settings
 from django.conf import settings
 from django.contrib.auth.models import User
 
 from library.models import RequestLog
 
-import unittest # Take this out once I stop skipping tests
 
-
-# class MiddlewaresTestCase(TestCase):
-class MiddlewaresTestCase(WebTest):
+class MiddlewaresTestCase(TestCase):
+# class MiddlewaresTestCase(WebTest):
 
     def setUp(self):
         super(MiddlewaresTestCase, self).setUp()
@@ -23,7 +20,6 @@ class MiddlewaresTestCase(WebTest):
     def tearDown(self):
         RequestLog.objects.all().delete()
 
-    # @unittest.skip("testing skipping")
     @override_settings(USE_WWW=False)
     def test_request_logging_middleware(self):
         """Should create an instance of RequestLog for each request attended"""
@@ -33,7 +29,6 @@ class MiddlewaresTestCase(WebTest):
         self.client.login(username=self.user.username, password='abc123')
         params = {'foo': 'bar'}
         self.client.get('/admin/', params, secure=True, follow=True)
-        # self.client.get('/admin/', params, follow=True)
 
         # Postconditions
         self.assertEqual(RequestLog.objects.count(), 1)
