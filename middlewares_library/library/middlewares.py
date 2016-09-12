@@ -1,13 +1,19 @@
 import time
+import logging
 
 from django.db import connection
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 
 # from middlewares_library import settings
 #  ^ This is wrong, because then I can't override the settings in my tests
 #  http://stackoverflow.com/questions/28799803/overriding-settings-for-unit-tests-in-django-doesnt-work-properly
 from django.conf import settings 
 from library.models import RequestLog
+
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
 
 class RequestLoggingMiddleware(object):
     """
@@ -30,8 +36,6 @@ class RequestLoggingMiddleware(object):
         else:
             user_agent = None
             
-        # print('Abs uri:', request.build_absolute_uri()) # for testing only
-        
         # Create the new instance
         RequestLog.objects.create(
             method=request.method,
@@ -55,6 +59,7 @@ class SSLRedirectMiddleware(object):
     If the request is not using HTTPS, redirects to the same URL but
     using HTTPS.
     """
+    # Check out request.is_secure()
     def process_request(self, request):
         # request.scheme = 'https' # Get an AttributeError: can't set attribute
         old_uri = request.build_absolute_uri()
@@ -81,7 +86,31 @@ class ExceptionLoggingMiddleware(object):
     """
     Writes a log entry for every exception raised in any request.
     """
-    pass
+    # def process_request(self, request):
+    #     self.url_error = True
+        
+    # def process_view(self, requeste, view_func, view_args, view_kwargs):
+    #     self.url_error = False
+    
+    def process_exception(self, request, exception):
+        logger.exception(str(exception))
+        # name = type(exception).__name__
+        # message = str(exception)
+        # line_no = exception.lineno
+        # print('***INSIDE PROCESS_EXCEPTIONS***')
+        # print('Name:', name)
+        # print('Message:', message)
+        # print('Line Number:', line_no)
+        return HttpResponse('Exception handled.')
+        # https://docs.python.org/2/library/logging.html#logging.Logger.exception
+        # https://docs.python.org/2/library/traceback.html#traceback.extract_tb
+    
+    # def process_response(self, request, response):
+    #     if self.url_error:
+    #         # Do something
+    #         print(request.build_absolute_uri())
+    #         print('url error encountered')
+    #     return response
 
 
 def request_uses_www(url):

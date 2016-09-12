@@ -56,6 +56,7 @@ MIDDLEWARE_CLASSES = [
     'library.middlewares.RequestLoggingMiddleware',
     'library.middlewares.SSLRedirectMiddleware',
     'library.middlewares.WWWRedirectMiddleware',
+    'library.middlewares.ExceptionLoggingMiddleware',
 ]
 
 ROOT_URLCONF = 'middlewares_library.urls'
