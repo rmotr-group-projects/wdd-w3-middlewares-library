@@ -86,32 +86,9 @@ class ExceptionLoggingMiddleware(object):
     """
     Writes a log entry for every exception raised in any request.
     """
-    # def process_request(self, request):
-    #     self.url_error = True
-        
-    # def process_view(self, requeste, view_func, view_args, view_kwargs):
-    #     self.url_error = False
-    
     def process_exception(self, request, exception):
         logger.exception(str(exception))
-        # name = type(exception).__name__
-        # message = str(exception)
-        # line_no = exception.lineno
-        # print('***INSIDE PROCESS_EXCEPTIONS***')
-        # print('Name:', name)
-        # print('Message:', message)
-        # print('Line Number:', line_no)
-        return HttpResponse('Exception handled.')
-        # https://docs.python.org/2/library/logging.html#logging.Logger.exception
-        # https://docs.python.org/2/library/traceback.html#traceback.extract_tb
-    
-    # def process_response(self, request, response):
-    #     if self.url_error:
-    #         # Do something
-    #         print(request.build_absolute_uri())
-    #         print('url error encountered')
-    #     return response
-
+        return HttpResponseRedirect('/')
 
 def request_uses_www(url):
     """
