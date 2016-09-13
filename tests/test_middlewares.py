@@ -75,17 +75,36 @@ class MiddlewaresTestCase(TestCase):
     def test_http_redirect_https(self):
         """If the requested URL uses HTTP, redirect the user to HTTPS-based URL"""
         # Preconditions
-        response = self.client.get('/', secure=False, follow=True, HTTP_HOST='example.com')
-        # print(response)
-        # print(response.redirect_chain)
-        self.assertEqual(response.status_code, 302)
+        response = self.client.get('/', secure=False, HTTP_HOST='example.com') #follow=True,
         
         # Postconditions
+        self.assertEqual(response.status_code, 302)
     
     def test_https_no_redirect(self):
         """If the requested URL uses HTTPS, do not redirect"""
         # Preconditions
-        response = self.client.get('/', secure=True, follow=True, HTTP_HOST='example.com')
-        self.assertEqual(response.status_code, 200)
+        response = self.client.get('/', secure=True, HTTP_HOST='example.com') #follow=True
         
         # Postconditions
+        # test for http/https
+        self.assertEqual(response.status_code, 200)
+        
+    def test_www_redirects(self):
+        """If the requested URL is coming with WWW, redirect"""
+        # Preconditions
+        response = self.client.get('/', secure=True, HTTP_HOST='www.example.com')
+        
+        # Postconditions
+        self.assertEqual(response.status_code, 302)
+        print(response.client)
+        self.assertEqual(response.request['HTTP_HOST'], 'example.com')
+    
+    def test_www_no_redirect(self):
+        """If the requested URL is not coming with WWW, do not redirect"""
+        # Preconditions
+        response = self.client.get('/', secure=True, HTTP_HOST='example.com')
+        
+        # Postconditions
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.request['HTTP_HOST'], 'example.com')
+        

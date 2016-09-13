@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 
 import datetime
 from math import floor
+from urlparse import urlparse
 
 class RequestLoggingMiddleware(object):
     """
@@ -12,7 +13,6 @@ class RequestLoggingMiddleware(object):
     code, ip, GET and POST params, etc. Follow the fields described in
     the RequestLog model.
     """
-
     def process_request(self, request):
         self.request_time = datetime.datetime.now()
 
@@ -50,77 +50,35 @@ class SSLRedirectMiddleware(object):
     If the request is not using HTTPS, redirects to the same URL but
     using HTTPS.
     """
-    # def process_request(self, request):
-        # print("SSL: " + request.scheme)
-        # print('HTTP_HOST' in request.META)
-        # print(request.META['HTTP_HOST'])
-        # if not request.is_secure():
-        #     print(request.scheme + "://" + request.META['HTTP_HOST'] + str(request.get_full_path()))
-        #     print('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
-        #     return HttpResponseRedirect('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
-    #     print(request.scheme)
-    #     print(request.is_secure())
-    #     if request.scheme == 'http':
-    #         print("HTTP")
-    #     else:
-    #         print("something else")
-    
     def process_response(self, request, response):
-        print(request.scheme)
-        print(request.is_secure())
         if not request.is_secure():
-            print(request.scheme + "://" + request.META['HTTP_HOST'] + str(request.get_full_path()))
-            print('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
             return HttpResponseRedirect('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
         return response
-    #     if not request.is_secure():
-    #     # print("SCHEME: " + request.scheme)
-    #     # print("IS_SECURE: " + str(request.is_secure()))
-    #     # if request.scheme == 'http':
-    #     #     print("HTTP")
-    #     # else:
-    #     #     print("something else")
-    #     # print(request.META['HTTP_X_FORWARDED_PROTO'])
-    #     # if request.META:
-    #     #     for i in request.META:
-    #     #         print(i)
-    #     #print('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
-    #     #return response
-    #     # if 'HTTP_X_FORWARDED_PROTO' in request.META:
-    #     #     if request.META['HTTP_X_FORWARDED_PROTO'] == 'http':
-    #     #         # print(str(request.get_full_path()))
-    #     #         # print("HTTP: " + request.META['HTTP_HOST'])
-    #     #         # print('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
-                
-    #     #         print("init")
-    #     #         print("PROTO1: " + request.META['HTTP_X_FORWARDED_PROTO'])
-    #         return HttpResponseRedirect('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
-    #     #         # return HttpResponseRedirect(request.build_absolute_uri(request.get_full_path()))
-    #     #     print("PROTO2: " + request.META['HTTP_X_FORWARDED_PROTO'])
-    #     return response
         
-    
-
 
 class WWWRedirectMiddleware(object):
     """
     If "www" is included in the URL, redirects to the nacked version
     of the domain (without "www" at the beginning)
     """
-    # def process_request(self, request):
-    #     print(request.build_absolute_uri(request.get_full_path()))
-    pass
+    def process_request(self, request):
+        original_url = request.build_absolute_uri(request.get_full_path())
+        url_parsed = urlparse(original_url)
+        nacked_url = url_parsed.netloc[4:] 
+        print(url_parsed.netloc)
+        print(nacked_url)
+        if "www" in url_parsed.netloc:
+            print(url_parsed.scheme + '://' + nacked_url + url_parsed.path)
+            print(request.META['HTTP_HOST'])
+            request.META['HTTP_HOST'] = url_parsed.scheme + '://' + nacked_url + url_parsed.path
+            print("FINAL: " + request.META['HTTP_HOST'])
+            return HttpResponseRedirect(url_parsed.scheme + '://' + nacked_url + url_parsed.path)
+        # print(request.build_absolute_uri(request.get_full_path()))
 
 class ExceptionLoggingMiddleware(object):
     """
     Writes a log entry for every exception raised in any request.
     """
-    # def process_request(self,request):
-    #     print("works")
-    
     def process_exception(self, request, exception):
         exception_logged = ExceptionLog.objects.create(type_of_exception=str(type(exception)), location=request.path)
         exception_logged.save()
-        # print("Logged")
-        # print(request)
-        # print(str(type(exception)))
