@@ -14,3 +14,7 @@ class RequestLog(models.Model):
     get_params = JSONField()
     user_agent = models.CharField(max_length=200, blank=True, null=True)
     query_count = models.IntegerField()
+    
+class ExceptionLog(models.Model):
+    type_of_exception = models.CharField(max_length=100)
+    location = models.CharField(max_length=100)
