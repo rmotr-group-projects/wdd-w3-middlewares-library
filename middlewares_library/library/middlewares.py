@@ -51,6 +51,13 @@ class SSLRedirectMiddleware(object):
     using HTTPS.
     """
     # def process_request(self, request):
+        # print("SSL: " + request.scheme)
+        # print('HTTP_HOST' in request.META)
+        # print(request.META['HTTP_HOST'])
+        # if not request.is_secure():
+        #     print(request.scheme + "://" + request.META['HTTP_HOST'] + str(request.get_full_path()))
+        #     print('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
+        #     return HttpResponseRedirect('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
     #     print(request.scheme)
     #     print(request.is_secure())
     #     if request.scheme == 'http':
@@ -59,30 +66,38 @@ class SSLRedirectMiddleware(object):
     #         print("something else")
     
     def process_response(self, request, response):
-        # print("SCHEME: " + request.scheme)
-        # print("IS_SECURE: " + str(request.is_secure()))
-        # if request.scheme == 'http':
-        #     print("HTTP")
-        # else:
-        #     print("something else")
-        # print(request.META['HTTP_X_FORWARDED_PROTO'])
-        # if request.META:
-        #     for i in request.META:
-        #         print(i)
-        #print('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
-        #return response
-        if 'HTTP_X_FORWARDED_PROTO' in request.META:
-            if request.META['HTTP_X_FORWARDED_PROTO'] == 'http':
-                # print(str(request.get_full_path()))
-                # print("HTTP: " + request.META['HTTP_HOST'])
-                # print('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
-                
-                print("init")
-                print("PROTO1: " + request.META['HTTP_X_FORWARDED_PROTO'])
-                return HttpResponseRedirect('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
-                # return HttpResponseRedirect(request.build_absolute_uri(request.get_full_path()))
-            print("PROTO2: " + request.META['HTTP_X_FORWARDED_PROTO'])
+        print(request.scheme)
+        print(request.is_secure())
+        if not request.is_secure():
+            print(request.scheme + "://" + request.META['HTTP_HOST'] + str(request.get_full_path()))
+            print('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
+            return HttpResponseRedirect('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
         return response
+    #     if not request.is_secure():
+    #     # print("SCHEME: " + request.scheme)
+    #     # print("IS_SECURE: " + str(request.is_secure()))
+    #     # if request.scheme == 'http':
+    #     #     print("HTTP")
+    #     # else:
+    #     #     print("something else")
+    #     # print(request.META['HTTP_X_FORWARDED_PROTO'])
+    #     # if request.META:
+    #     #     for i in request.META:
+    #     #         print(i)
+    #     #print('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
+    #     #return response
+    #     # if 'HTTP_X_FORWARDED_PROTO' in request.META:
+    #     #     if request.META['HTTP_X_FORWARDED_PROTO'] == 'http':
+    #     #         # print(str(request.get_full_path()))
+    #     #         # print("HTTP: " + request.META['HTTP_HOST'])
+    #     #         # print('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
+                
+    #     #         print("init")
+    #     #         print("PROTO1: " + request.META['HTTP_X_FORWARDED_PROTO'])
+    #         return HttpResponseRedirect('https://' + request.META['HTTP_HOST'] + str(request.get_full_path()))
+    #     #         # return HttpResponseRedirect(request.build_absolute_uri(request.get_full_path()))
+    #     #     print("PROTO2: " + request.META['HTTP_X_FORWARDED_PROTO'])
+    #     return response
         
     
 

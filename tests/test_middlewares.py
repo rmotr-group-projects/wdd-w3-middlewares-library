@@ -25,7 +25,7 @@ class MiddlewaresTestCase(TestCase):
 
         self.client.login(username=self.user.username, password='abc123')
         params = {'foo': 'bar'}
-        self.client.get('/admin/', params, follow=True)
+        self.client.get('/admin/', params, follow=True, secure=True, HTTP_HOST='example.com')
 
         # Postconditions
         self.assertEqual(RequestLog.objects.count(), 1)
@@ -40,15 +40,6 @@ class MiddlewaresTestCase(TestCase):
         self.assertEqual(log.query_count, 0)
         self.assertTrue(isinstance(log.timestamp, datetime))
         self.assertTrue(isinstance(log.duration_in_seconds, int))
-        
-# class ExceptionTestCase(TestCase):
-#     # Go to a page with no exception
-#     # Go to a page with exception
-    
-    
-#     # def setUp(self):
-#     #     ExceptionLog.objects.create(name="lion", sound="roar")
-#     #     ExceptionLog.objects.create(name="cat", sound="meow")
 
     def test_page_with_no_exception(self):
         """Pages with no exception are ignored by the middleware"""
@@ -57,8 +48,8 @@ class MiddlewaresTestCase(TestCase):
         
         self.client.login(username=self.user.username, password='abc123')
         params = {}
-        self.client.get('/admin/', params, follow=True)
-        self.client.get('/no-exception/')
+        #self.client.get('/admin/', params, follow=True, secure=True)
+        self.client.get('/no-exception/', follow=True, secure=True, HTTP_HOST='example.com')
         
         # Postconditions
         self.assertEqual(ExceptionLog.objects.count(), 0)
@@ -70,9 +61,9 @@ class MiddlewaresTestCase(TestCase):
         
         self.client.login(username=self.user.username, password='abc123')
         params = {}
-        self.client.get('/admin/', params, follow=True)
+        # self.client.get('/admin/', params, follow=True, secure=True, HTTP_HOST='example.com')
         try:
-            self.client.get('/exception')
+            self.client.get('/exception', secure=True, HTTP_HOST='example.com') #follow=True, 
         except:
             self.assertEqual(ExceptionLog.objects.count(), 1)
         
@@ -84,19 +75,17 @@ class MiddlewaresTestCase(TestCase):
     def test_http_redirect_https(self):
         """If the requested URL uses HTTP, redirect the user to HTTPS-based URL"""
         # Preconditions
-        response = self.client.get('/', secure=False, follow=True)
+        response = self.client.get('/', secure=False, follow=True, HTTP_HOST='example.com')
         # print(response)
         # print(response.redirect_chain)
         self.assertEqual(response.status_code, 302)
         
         # Postconditions
+    
+    def test_https_no_redirect(self):
+        """If the requested URL uses HTTPS, do not redirect"""
+        # Preconditions
+        response = self.client.get('/', secure=True, follow=True, HTTP_HOST='example.com')
+        self.assertEqual(response.status_code, 200)
         
-        
-        
-        
-    # def page_with_exception(self):
-    #     """Animals that can speak are correctly identified"""
-    #     lion = Animal.objects.get(name="lion")
-    #     cat = Animal.objects.get(name="cat")
-    #     self.assertEqual(lion.speak(), 'The lion says "roar"')
-    #     self.assertEqual(cat.speak(), 'The cat says "meow"')
+        # Postconditions
